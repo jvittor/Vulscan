@@ -3,7 +3,7 @@ import ArcGISMap from './components/Home/index';
 
 const Home = () => {
   return (
-    <div className="w-full">
+    <div className="flex h-full w-full items-center justify-center">
       <ArcGISMap />
     </div>
   );

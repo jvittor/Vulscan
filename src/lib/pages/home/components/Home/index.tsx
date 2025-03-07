@@ -1,12 +1,35 @@
-const Index = () => {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
-      <h1 className="text-3xl font-bold text-gray-900">Bem-vindo!</h1>
-      <p className="mt-2 text-gray-700">
-        Esta é a página inicial do seu aplicativo.
-      </p>
-    </div>
-  );
+'use client';
+
+import React, { useEffect, useRef } from 'react';
+import Map from '@arcgis/core/Map';
+import MapView from '@arcgis/core/views/MapView';
+import '@arcgis/core/assets/esri/themes/light/main.css';
+
+const ArcGISMap: React.FC = () => {
+  const mapDiv = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (mapDiv.current) {
+      const map = new Map({
+        basemap: 'streets-vector',
+      });
+
+      const view = new MapView({
+        container: mapDiv.current,
+        map: map,
+        center: [-43.3728, -12.6675], // Coordenadas de Cruz das Almas, Bahia
+        zoom: 12,
+      });
+
+      return () => {
+        if (view) {
+          view.destroy();
+        }
+      };
+    }
+  }, []);
+
+  return <div style={{ height: '100vh', width: '100%' }} ref={mapDiv}></div>;
 };
 
-export default Index;
+export default ArcGISMap;

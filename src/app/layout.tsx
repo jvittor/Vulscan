@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-sync-scripts */
 import { Metadata, Viewport } from 'next';
 // import Head from 'next/head';  // Importar o componente Head do Next.js
 import Layout from '@/lib/layout';
@@ -50,16 +49,16 @@ const RootLayout = ({ children }: RootLayoutProps) => {
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Adicionar a chave API do ArcGIS diretamente */}
-        <script src="https://js.arcgis.com/4.24/?apikey=AAPTxy8BH1VEsoebNVZXo8HurF6Gi5n_rauMuGZ_nfRTcScuUOx-7qWr8679vu9Fs9pyWFk0kS3bqJ1mxcOXJLJfM9aoVS0j0QJ6LdoRz4LlpZgw91ACKW1XpErsWydCpjxNkil5OsPdHs3nqxo0RSvbd65UaVBZwTOReluZPx_4ccI0CrNAaYTiyLdc2iOzYrIF9xXJysjNtl3qZGT-fLJ1a5k354We5-mTCKyHTMtcbww.AT1_kpz6whSJ" />
+        {/* <script src="https://js.arcgis.com/4.24/?apikey=AAPTxy8BH1VEsoebNVZXo8HurF6Gi5n_rauMuGZ_nfRTcScuUOx-7qWr8679vu9Fs9pyWFk0kS3bqJ1mxcOXJLJfM9aoVS0j0QJ6LdoRz4LlpZgw91ACKW1XpErsWydCpjxNkil5OsPdHs3nqxo0RSvbd65UaVBZwTOReluZPx_4ccI0CrNAaYTiyLdc2iOzYrIF9xXJysjNtl3qZGT-fLJ1a5k354We5-mTCKyHTMtcbww.AT1_kpz6whSJ" /> */}
       </head>
       <body
         className={cn(
-          'bg-background min-h-screen font-sans antialiased',
+          'min-h-screen w-full bg-black font-sans antialiased',
           fontSans.variable
         )}
       >
         <Layout>
-          <div className="flex-1">{children}</div>
+          <div className="w-full flex-1">{children}</div>
         </Layout>
       </body>
     </html>
