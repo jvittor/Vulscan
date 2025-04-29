@@ -50,3 +50,5 @@ sitemap*.xml
 
 # Turbo
 .turbo
+
+.env

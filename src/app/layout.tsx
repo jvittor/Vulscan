@@ -6,7 +6,7 @@ import { fontSans } from '@/lib/styles/fonts';
 import { cn } from '@/lib/styles/utils';
 import '@/lib/styles/globals.css';
 
-const APP_NAME = 'minke';
+const APP_NAME = 'Vuscan';
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     url: '',
-    title: 'minke',
+    title: 'Vuscan',
     description: '',
     images: {
       url: 'https://og-image.sznm.dev/**nextarter-tailwind**.sznm.dev.png?theme=dark&md=1&fontSize=125px&images=https%3A%2F%2Fsznm.dev%2Favataaars.svg&widths=250',

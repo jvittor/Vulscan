@@ -7,8 +7,7 @@ const LoadingWithProgress = () => {
   return (
     <div className="flex h-full w-full items-center justify-center bg-white">
       <div className="flex w-[400px] flex-col items-center justify-center p-8">
-        <Image src="/assets/logo.png" alt="Logo" width={70} height={70} />
-        <p className="h-full text-2xl font-bold text-[#343434]">minke</p>
+        <Image src="/logo.png" alt="Logo" width={70} height={70} />
 
         <Box sx={{ width: '100%', mt: 3 }}>
           <LinearProgress />

@@ -50,30 +50,131 @@ const ArcGISMap: React.FC = () => {
     mare_alta: '',
     altura_ondas: '',
     projecao_futura: '',
+    periodo_onda: '', // Valor padrão
+    declividade_praia: '', // Valor padrão
   });
   const [arquivoMDE, setArquivoMDE] = useState<File | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [fileStatus, setFileStatus] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingScreen, setIsLoadingScreen] = useState(true);
+  const [mdeExtent] = useState<any>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const getMdeExtent = async (file: File) => {
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      const uploadResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/upload`,
+        {
+          method: 'POST',
+          body: formDataUpload,
+        }
+      );
+
+      const uploadData = await uploadResponse.json();
+      if (!uploadData.caminho_arquivo) {
+        console.error('Erro ao fazer upload do arquivo:', uploadData.erro);
+        return null;
+      }
+      const centerResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/get_center`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            arquivo_mde: uploadData.caminho_arquivo,
+          }),
+        }
+      );
+
+      const centerData = await centerResponse.json();
+
+      if (centerData.center) {
+        return {
+          center: centerData.center,
+          filepath: uploadData.caminho_arquivo,
+        };
+      } else {
+        console.error('Erro ao obter o center do MDE:', centerData.erro);
+        return null;
+      }
+    } catch (err) {
+      console.error('Erro ao obter center do MDE:', err);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.name.endsWith('.tif')) {
         setArquivoMDE(file);
         setFileStatus('✅ MDE carregado');
+
+        const mdeData = await getMdeExtent(file);
+        if (mdeData && mdeData.center) {
+          if (viewRef.current && mdeData.center) {
+            viewRef.current
+              .goTo({
+                center: [mdeData.center.x, mdeData.center.y],
+                zoom: 8,
+              })
+              .catch((error: any) => {
+                console.error('Erro ao ajustar a visualização:', error);
+              });
+          }
+        }
+
         setOpenModal(true);
       } else {
         setFileStatus('❌ Apenas arquivos .tif são aceitos');
       }
     }
   };
+  useEffect(() => {
+    loadModules([
+      'esri/Map',
+      'esri/views/MapView',
+      'esri/layers/GeoJSONLayer',
+    ]).then(([GeoJSONLayer]: any[]) => {
+      if (geojsonUrl && isGeojsonLoaded) {
+        if (geojsonLayerRef.current) {
+          mapRef.current.remove(geojsonLayerRef.current);
+        }
+
+        const geojsonLayer = new GeoJSONLayer({
+          url: geojsonUrl,
+          renderer: {
+            type: 'simple',
+            symbol: {
+              type: 'simple-fill',
+              color: [227, 139, 79, 0.3],
+              outline: { color: [255, 0, 0], width: 1.5 },
+            },
+          },
+        });
+
+        geojsonLayerRef.current = geojsonLayer;
+        mapRef.current.add(geojsonLayer);
+
+        geojsonLayer.when(() => {
+          viewRef.current.goTo(geojsonLayer.fullExtent).catch((error: any) => {
+            console.error('Erro ao ajustar a visualização:', error);
+          });
+        });
+      }
+    });
+  }, [geojsonUrl, isGeojsonLoaded]);
   const handleButtonClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -120,14 +221,15 @@ const ArcGISMap: React.FC = () => {
             mare_alta: parseFloat(formData.mare_alta),
             altura_ondas: parseFloat(formData.altura_ondas),
             projecao_futura: parseFloat(formData.projecao_futura),
+            periodo_onda: parseFloat(formData.periodo_onda),
+            declividade_praia: parseFloat(formData.declividade_praia),
           }),
         }
       );
 
       const processamentoData = await processamentoResponse.json();
-      if (processamentoData.arquivo_url) {
-        const nomeArquivo = processamentoData.arquivo_url.split('/').pop();
-        const geojsonUrl = `${process.env.NEXT_PUBLIC_API_URL}/static/uploads/${nomeArquivo}`;
+      if (processamentoData.arquivo_geojson) {
+        const geojsonUrl = `${process.env.NEXT_PUBLIC_API_URL}${processamentoData.arquivo_geojson}`;
         const geojsonResponse = await fetch(geojsonUrl);
         const geojsonData = await geojsonResponse.json();
 
@@ -189,6 +291,24 @@ const ArcGISMap: React.FC = () => {
           });
       }
 
+      // Verificar se temos um extent do MDE para centralizar o mapa
+      if (mdeExtent && viewRef.current) {
+        loadModules(['esri/geometry/Extent']).then(([Extent]: any[]) => {
+          const extent = new Extent({
+            xmin: mdeExtent.xmin,
+            ymin: mdeExtent.ymin,
+            xmax: mdeExtent.xmax,
+            ymax: mdeExtent.ymax,
+            spatialReference: { wkid: mdeExtent.spatialReference },
+          });
+
+          viewRef.current.goTo(extent).catch((error: any) => {
+            console.error('Erro ao ajustar a visualização:', error);
+          });
+        });
+      }
+
+      // Carregar a camada GeoJSON se disponível
       if (geojsonUrl && isGeojsonLoaded) {
         if (geojsonLayerRef.current) {
           mapRef.current.remove(geojsonLayerRef.current);
@@ -216,7 +336,7 @@ const ArcGISMap: React.FC = () => {
         });
       }
     });
-  }, [geojsonUrl, isGeojsonLoaded]);
+  }, [geojsonUrl, isGeojsonLoaded, mdeExtent]);
 
   return (
     <div className="flex h-screen w-full flex-row">
@@ -229,8 +349,7 @@ const ArcGISMap: React.FC = () => {
             className="mb-4 h-[100vh] w-[800px] overflow-y-auto border bg-[#EEEEEE] p-10 shadow"
           >
             <div className="mt-5 mb-5 flex flex-col items-center justify-center">
-              <Image src="/assets/logo.png" alt="Logo" width={70} height={70} />
-              <p className="h-full text-2xl font-bold text-[#343434]">minke</p>
+              <Image src="/logo.png" alt="Logo" width={90} height={90} />
             </div>
             <div className="grid grid-cols-1 gap-5">
               <div className="mb-2">
@@ -310,6 +429,32 @@ const ArcGISMap: React.FC = () => {
                   value={formData.projecao_futura}
                 />
               </div>
+              <div>
+                <CustomTextField
+                  required
+                  id="periodo_onda"
+                  name="periodo_onda"
+                  label="Período da Onda"
+                  variant="outlined"
+                  type="number"
+                  fullWidth
+                  onChange={handleChange}
+                  value={formData.periodo_onda}
+                />
+              </div>
+              <div>
+                <CustomTextField
+                  required
+                  id="declividade_praia"
+                  name="declividade_praia"
+                  label="Declividade da Praia (graus)"
+                  variant="outlined"
+                  type="number"
+                  fullWidth
+                  onChange={handleChange}
+                  value={formData.declividade_praia}
+                />
+              </div>
               <button type="submit" className="continue-application">
                 <div>
                   <div className="pencil"></div>
@@ -358,7 +503,8 @@ const ArcGISMap: React.FC = () => {
                 Arquivo MDE Carregado
               </Typography>
               <Typography id="modal-description" sx={{ mt: 2 }}>
-                O arquivo foi carregado com sucesso! 🎉
+                O arquivo foi carregado com sucesso e o mapa foi centralizado na
+                região do MDE.
               </Typography>
               <Button
                 className="bg-black text-white"
