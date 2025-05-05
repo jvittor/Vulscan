@@ -1,10 +1,10 @@
 // import { CTASection } from './components/cta-section';
-import Hero from './components/home-hero';
+import ArcGISMap from './components/index';
 
 const Home = () => {
   return (
     <div className="flex h-full w-full items-center justify-center">
-      <Hero />
+      <ArcGISMap />
     </div>
   );
 };
