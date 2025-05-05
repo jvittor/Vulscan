@@ -42,6 +42,7 @@ const ArcGISMap: React.FC = () => {
   const [geojsonUrl, setGeojsonUrl] = useState<string | null>(null);
   const [isGeojsonLoaded, setIsGeojsonLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingUpload, setIsLoadingUpload] = useState(false);
   const mapRef = useRef<any>(null);
   const viewRef = useRef<any>(null);
   const geojsonLayerRef = useRef<any>(null);
@@ -50,8 +51,8 @@ const ArcGISMap: React.FC = () => {
     mare_alta: '',
     altura_ondas: '',
     projecao_futura: '',
-    periodo_onda: '', // Valor padrão
-    declividade_praia: '', // Valor padrão
+    periodo_onda: '',
+    declividade_praia: '',
   });
   const [arquivoMDE, setArquivoMDE] = useState<File | null>(null);
   const [openModal, setOpenModal] = useState(false);
@@ -120,7 +121,8 @@ const ArcGISMap: React.FC = () => {
       if (file.name.endsWith('.tif')) {
         setArquivoMDE(file);
         setFileStatus('✅ MDE carregado');
-
+        setIsLoadingUpload(true); // Ativa o estado de carregamento para upload
+  
         const mdeData = await getMdeExtent(file);
         if (mdeData && mdeData.center) {
           if (viewRef.current && mdeData.center) {
@@ -134,11 +136,12 @@ const ArcGISMap: React.FC = () => {
               });
           }
         }
-
+  
         setOpenModal(true);
       } else {
         setFileStatus('❌ Apenas arquivos .tif são aceitos');
       }
+      setIsLoadingUpload(false);
     }
   };
   useEffect(() => {
@@ -472,23 +475,32 @@ const ArcGISMap: React.FC = () => {
             </div>
           </form>
 
-          <div
-            ref={mapDiv}
-            className="relative h-screen w-full"
-            style={{
-              width: '100%',
-              height: '100vh',
-            }}
-          >
-            {isLoading && (
-              <>
-                <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center bg-white/40">
-                  <p className="text-2xl font-bold text-gray-700"></p>
-                  <HexGrid />
-                </div>
-                <LoadingOverlay isLoading={isLoading} />
-              </>
+          <div className="relative h-screen w-full">
+            {isLoadingUpload && (
+              <div className="absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-white/40">
+                <p className="text-2xl font-bold text-gray-700">
+                  Carregando...
+                </p>
+              </div>
             )}
+            <div
+              ref={mapDiv}
+              className="relative h-screen w-full"
+              style={{
+                width: '100%',
+                height: '100vh',
+              }}
+            >
+              {isLoading && (
+                <>
+                  <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center bg-white/40">
+                    <p className="text-2xl font-bold text-gray-700"></p>
+                    <HexGrid />
+                  </div>
+                  <LoadingOverlay isLoading={isLoading} />
+                </>
+              )}
+            </div>
           </div>
 
           {/* Modal de Confirmação */}

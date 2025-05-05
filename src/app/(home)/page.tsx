@@ -1,5 +1,5 @@
 // import { CTASection } from './components/cta-section';
-import ArcGISMap from './components/Home/index';
+import ArcGISMap from '../(home)/components/index';
 
 const Home = () => {
   return (
