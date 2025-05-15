@@ -43,9 +43,9 @@ export default function HomeHero() {
         {/** Botão Vuscan */}
         <Link
           href="/map"
-          className="cursor-pointer flex justify-center items-center px-2 bg-transparent backdrop-blur-md backdrop-brightness-75 text-white font-bold rounded-xl border-4 border-white transition-transform duration-300 hover:scale-105"
+          className="cursor-pointer flex justify-center items-center px-5 bg-transparent backdrop-blur-md backdrop-brightness-75 text-white font-bold rounded-xl border-4 border-white transition-transform duration-300 hover:scale-105"
         >
-          <img src="/logo.png" className="max-w-[100px]" />
+          <img src="/logo-vuscan-white.png" className="max-w-[100px] -ml-5" />
           <p className="text-xl text-white">Acesse o Vuscan</p>
         </Link>
       </div>
