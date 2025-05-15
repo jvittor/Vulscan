@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { ThemeProvider } from '@/lib/components/theme-provider';
 
-// import { Footer } from './components/footer';
+import { Footer } from './components/footer';
 // import { Header } from './components/header';
 
 type LayoutProps = {
@@ -14,6 +14,7 @@ const Layout = ({ children }: LayoutProps) => {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <div className="flex min-h-screen w-full flex-col">
         <main className="w-full">{children}</main>
+        <Footer />
       </div>
     </ThemeProvider>
   );

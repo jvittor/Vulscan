@@ -1,10 +1,12 @@
 // import { CTASection } from './components/cta-section';
 import HomeHero from './components/home-hero';
+import HomeAbout from './components/home-about';
 
 const Home = () => {
   return (
-    <div className="flex h-full w-full items-center justify-center">
+    <div>
       <HomeHero />
+      <HomeAbout />
     </div>
   );
 };
