@@ -28,6 +28,24 @@
   }
 }
 
+@keyframes slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-slider {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.animate-slider > div {
+  animation: slide 20s linear infinite;
+}
+
 @layer base {
   h1 {
     @apply text-4xl font-bold md:text-5xl;

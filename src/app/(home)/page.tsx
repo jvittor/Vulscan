@@ -2,6 +2,7 @@
 import HomeHero from './components/home-hero';
 import HomeAbout from './components/home-about';
 import HomeTimeline from './components/home-timeline';
+import { LogoGrid } from './components/home-slide-logos';
 
 const Home = () => {
   return (
@@ -9,6 +10,7 @@ const Home = () => {
       <HomeHero />
       <HomeAbout />
       <HomeTimeline />
+      <LogoGrid />
     </div>
   );
 };
