@@ -8,7 +8,7 @@ const logoIcons: LogoData[] = [
   {
     id: "logo-1",
     src: "/home/ufba.png",
-    height: "100px",
+    height: "200px",
   },
   {
     id: "logo-2",

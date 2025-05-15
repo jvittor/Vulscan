@@ -12,12 +12,12 @@ const HomeAbout = () => {
                         </p>
                     </div>
                     <div className="md:w-1/2">
-                        <div className="flex items-end relative h-[400px] w-full">
+                        <div className="flex items-end relative h-[700px] w-[700px]">
                             <Image
-                                src="/logo.png"
+                                src="/home/logo-lec.png"
                                 alt="About us image"
                                 fill
-                                className="object-cover rounded-lg"
+                                className="object-cover rounded-full"
                                 priority
                             />
                         </div>
